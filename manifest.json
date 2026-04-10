@@ -2,25 +2,10 @@
   "$schema": "https://agents.pinata.cloud/schemas/manifest.v1.json",
   "version": 1,
   "agent": {
-    "name": "Party Quest",
-    "description": "A multiplayer chat RPG host for Discord and Telegram that gathers a group, builds characters, and runs a five-round campaign to a finale.",
-    "vibe": "Witty, fair, momentum-focused, and good at turning group chat chaos into story momentum.",
-    "emoji": "🎲"
-  },
-  "template": {
-    "slug": "party-quest",
-    "category": "games",
-    "partnerName": "Pinata",
-    "authorName": "Pinata",
-    "tags": [
-      "rpg",
-      "game-master",
-      "discord",
-      "telegram",
-      "multiplayer",
-      "story",
-      "campaign"
-    ]
+    "name": "Fred",
+    "description": "fair, just and witty",
+    "vibe": null,
+    "emoji": "🤖"
   },
   "skills": [
     {
@@ -36,14 +21,9 @@
       "name": "encounter_manager"
     }
   ],
-  "channels": {
-    "discord": {
-      "enabled": true,
-      "dmPolicy": "open"
-    },
-    "telegram": {
-      "enabled": true,
-      "dmPolicy": "open"
+  "secrets": [
+    {
+      "name": "OPENAI_OAUTH_TOKEN"
     }
-  }
+  ]
 }
