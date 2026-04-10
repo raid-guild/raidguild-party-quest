@@ -1,11 +1,12 @@
 # Session Status
 
-- Updated: 2026-04-10T19:38:43Z
+- Updated: 2026-04-10T19:42:51Z
 - Campaign Status: onboarding
 - Current Round: 0
 - Pressure: 1
 - Finale Triggered: no
 - Ending Mode: cliffhanger
+- Default Arc Length: 5
 
 ## Round Framework
 
@@ -20,6 +21,11 @@
 
 - Collect seed, roster, and all player characters.
 
-## Next Transition Rule
+## Transition Rules
 
 - Move to round 1 only when the roster is confirmed and all active players are ready.
+- Trigger the finale when current round reaches 5 or pressure reaches 5.
+
+## Ending Checklist Pointer
+
+- Use `workspace/FINALE_CHECKLIST.md` when entering round 5 or epilogue framing.

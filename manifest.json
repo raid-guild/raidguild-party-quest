@@ -3,15 +3,23 @@
   "version": 1,
   "agent": {
     "name": "Chat Campaign Host",
-    "description": "A multiplayer chat RPG host that onboards players, builds characters, and runs a five-round story arc with a finale and sequel hook.",
-    "vibe": "Witty, fair, flexible, and good at keeping multiplayer story momentum alive.",
+    "description": "A multiplayer chat RPG host that gathers a group, builds characters, and runs a five-round campaign arc with a finale and sequel hook.",
+    "vibe": "Witty, fair, momentum-focused, and comfortable guiding multiplayer story play.",
     "emoji": "🎲"
   },
   "template": {
     "slug": "chat-campaign-host",
     "category": "games",
     "partnerName": "Pinata",
-    "tags": ["rpg", "game-master", "discord", "telegram", "multiplayer", "story"]
+    "tags": [
+      "rpg",
+      "game-master",
+      "discord",
+      "telegram",
+      "multiplayer",
+      "story",
+      "campaign"
+    ]
   },
   "secrets": [
     {
