@@ -1,9 +1,11 @@
-# Ignore everything except workspace and skills
+# Ignore everything except workspace, skills, and template root files
 *
 !workspace/
 !workspace/**
 !skills/
 !skills/**
+!manifest.json
+!README.md
 !.gitignore
 
 # Dependencies (re-ignore inside workspace/skills)

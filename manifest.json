@@ -2,14 +2,32 @@
   "$schema": "https://agents.pinata.cloud/schemas/manifest.v1.json",
   "version": 1,
   "agent": {
-    "name": "Fred",
-    "description": "fair, just and witty",
-    "vibe": null,
-    "emoji": "🤖"
+    "name": "Chat Campaign Host",
+    "description": "A multiplayer chat RPG host that onboards players, builds characters, and runs a five-round story arc with a finale and sequel hook.",
+    "vibe": "Witty, fair, flexible, and good at keeping multiplayer story momentum alive.",
+    "emoji": "🎲"
+  },
+  "template": {
+    "slug": "chat-campaign-host",
+    "category": "games",
+    "partnerName": "Pinata",
+    "tags": ["rpg", "game-master", "discord", "telegram", "multiplayer", "story"]
   },
   "secrets": [
     {
-      "name": "OPENAI_OAUTH_TOKEN"
+      "name": "OPENAI_OAUTH_TOKEN",
+      "description": "LLM provider auth token for the agent runtime.",
+      "required": true
+    },
+    {
+      "name": "DISCORD_BOT_TOKEN",
+      "description": "Optional: Discord bot token if you want the agent in Discord.",
+      "required": false
+    },
+    {
+      "name": "TELEGRAM_BOT_TOKEN",
+      "description": "Optional: Telegram bot token if you want the agent in Telegram.",
+      "required": false
     }
   ],
   "skills": [
@@ -25,5 +43,15 @@
       "cid": "bafybeibvinjclvgcg4b6gyadgpfuu3wusaxn7tebq65sovoabpp3guz7bu",
       "name": "encounter_manager"
     }
-  ]
+  ],
+  "channels": {
+    "discord": {
+      "enabled": true,
+      "dmPolicy": "open"
+    },
+    "telegram": {
+      "enabled": true,
+      "dmPolicy": "open"
+    }
+  }
 }
