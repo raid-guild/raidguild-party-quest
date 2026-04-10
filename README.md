@@ -1,5 +1,7 @@
 # Party Quest
 
+*Multiplayer chat RPGs for Discord and Telegram.*
+
 A Pinata agent template for running compact multiplayer chat-based RPG campaigns in Discord or Telegram.
 
 ## What it does
