@@ -11,5 +11,19 @@
     {
       "name": "OPENAI_OAUTH_TOKEN"
     }
+  ],
+  "skills": [
+    {
+      "cid": "bafybeie6g6uyzkmq65y43v4qfgn6kguv5zvuduo2lcvqixlgsqzncc46fi",
+      "name": "campaign_manager"
+    },
+    {
+      "cid": "bafybeiad25mryaxea7fcepyincqmz4u34hymxqybtosrc7lyiml2o253lm",
+      "name": "character_creation"
+    },
+    {
+      "cid": "bafybeibvinjclvgcg4b6gyadgpfuu3wusaxn7tebq65sovoabpp3guz7bu",
+      "name": "encounter_manager"
+    }
   ]
 }
