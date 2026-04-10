@@ -1,0 +1,4 @@
+interface:
+  display_name: "Character Creation"
+  short_description: "Draft story-first player characters and handoffs"
+  default_prompt: "Use $character_creation to build or revise a character draft and export the campaign handoff."

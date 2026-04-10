@@ -1,0 +1,69 @@
+{
+  "version": "0.1.0",
+  "steps": [
+    {
+      "id": "start",
+      "title": "Start",
+      "goal": "Determine whether the user already has a concept or wants recommendations.",
+      "prompts": [
+        "Let's build the character step by step. Do you already know the kind of person you want to play, or do you want a few suggestions?"
+      ]
+    },
+    {
+      "id": "concept",
+      "title": "Concept",
+      "requiredFields": [
+        "concept",
+        "role"
+      ],
+      "questionOrder": [
+        "concept",
+        "role"
+      ]
+    },
+    {
+      "id": "identity",
+      "title": "Identity",
+      "requiredFields": [
+        "name"
+      ],
+      "questionOrder": [
+        "name"
+      ]
+    },
+    {
+      "id": "pressure",
+      "title": "Pressure",
+      "requiredFields": [
+        "drive",
+        "fear"
+      ],
+      "questionOrder": [
+        "drive",
+        "fear"
+      ]
+    },
+    {
+      "id": "detail",
+      "title": "Detail",
+      "requiredFields": [
+        "edge",
+        "flaw"
+      ],
+      "questionOrder": [
+        "edge",
+        "flaw"
+      ]
+    },
+    {
+      "id": "review",
+      "title": "Review",
+      "requiredFields": [],
+      "notes": [
+        "Show summary.",
+        "Offer final JSON.",
+        "Mark the draft ready when the minimum fields are present."
+      ]
+    }
+  ]
+}

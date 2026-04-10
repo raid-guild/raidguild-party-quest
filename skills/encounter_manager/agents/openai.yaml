@@ -1,0 +1,4 @@
+interface:
+  display_name: "Encounter Manager"
+  short_description: "Resolve narrative encounters with lightweight d20 rules"
+  default_prompt: "Use $encounter_manager to prepare or resolve a single encounter beat and export the campaign result."

@@ -1,0 +1,13 @@
+{
+  "intent": "create_character",
+  "mode": "beginner",
+  "currentStep": "start",
+  "completedSteps": [],
+  "pendingQuestion": {
+    "field": "concept",
+    "question": "What kind of person do you want this character to be?"
+  },
+  "characterDraft": {},
+  "validationErrors": [],
+  "assumptions": []
+}

@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Story Character Creator Session State",
+  "type": "object",
+  "properties": {
+    "intent": {
+      "type": "string",
+      "const": "create_character"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["beginner", "standard", "expert"],
+      "default": "beginner"
+    },
+    "currentStep": {
+      "type": "string",
+      "default": "start"
+    },
+    "completedSteps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "pendingQuestion": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "default": ""
+        },
+        "question": {
+          "type": "string",
+          "default": ""
+        }
+      },
+      "default": {
+        "field": "",
+        "question": ""
+      }
+    },
+    "characterDraft": {
+      "type": "object",
+      "default": {}
+    },
+    "validationErrors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "default": []
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    }
+  }
+}

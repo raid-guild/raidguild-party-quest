@@ -1,0 +1,26 @@
+{
+  "encounter_id": "TP-001",
+  "status": "ongoing",
+  "summary": "",
+  "updated_scene_state": {},
+  "action_resolutions": [],
+  "consequences": {
+    "narrative_update": "",
+    "state_changes": {
+      "players": [],
+      "npcs": [],
+      "monsters": []
+    },
+    "scene_changes": {
+      "added_hazards": [],
+      "removed_hazards": [],
+      "added_opportunities": [],
+      "removed_opportunities": [],
+      "environment_changes": []
+    },
+    "new_story_hooks": [],
+    "escalation": "none"
+  },
+  "gm_notes": [],
+  "suggested_next_prompts": []
+}

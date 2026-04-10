@@ -1,0 +1,4 @@
+interface:
+  display_name: "Campaign Manager"
+  short_description: "Manage RPG campaign state and story arcs"
+  default_prompt: "Use $campaign_manager to bootstrap or advance the campaign and prepare the next encounter handoff."

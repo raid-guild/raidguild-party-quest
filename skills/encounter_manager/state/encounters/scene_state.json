@@ -1,0 +1,10 @@
+{
+  "round": 1,
+  "phase": "setup",
+  "tension": "rising",
+  "active_hazards": [],
+  "active_opportunities": [],
+  "environment_changes": [],
+  "unresolved_threads": [],
+  "spotlight_order": []
+}

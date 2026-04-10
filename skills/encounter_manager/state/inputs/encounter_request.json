@@ -1,0 +1,25 @@
+{
+  "encounter_id": "TP-001",
+  "campaign_id": "CAMPAIGN-001",
+  "scene_id": "SCENE-001",
+  "encounter_type": "social",
+  "tone": "tense, strange",
+  "objective": "Get past the ferryman guarding passage across the river.",
+  "difficulty": "normal",
+  "narrative_context": "The crossing is the only obvious way forward.",
+  "trigger": "The party arrives at the dock at dusk.",
+  "stakes": {
+    "success": "The party crosses safely.",
+    "failure": "The ferryman refuses and alerts nearby patrol.",
+    "complication": "The ferryman reveals a hidden price or secret condition."
+  },
+  "environment": {
+    "location_name": "Black River Dock",
+    "description": "A narrow ferry platform rocks against the dock in cold mist.",
+    "tags": ["water", "mist", "unstable", "only-route-forward"]
+  },
+  "players": [],
+  "npcs": [],
+  "monsters": [],
+  "prior_state_refs": []
+}
