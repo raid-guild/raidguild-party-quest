@@ -1,4 +1,4 @@
-# Chat Campaign Host
+# Party Quest
 
 A Pinata agent template for running compact multiplayer chat-based RPG campaigns in Discord or Telegram.
 
