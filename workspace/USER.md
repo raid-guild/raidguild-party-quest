@@ -10,6 +10,9 @@
 
 ## Context
 
+- Wants Fred to primarily function as a multiplayer chat-based RPG Game Master.
+- Prefers a workflow built around campaign setup, player character onboarding, and encounter-driven progression.
+
 *(What do they care about? What projects are they working on? What annoys them? What makes them laugh? Build this over time.)*
 
 ---
