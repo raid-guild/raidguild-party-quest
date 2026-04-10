@@ -2,11 +2,42 @@
   "$schema": "https://agents.pinata.cloud/schemas/manifest.v1.json",
   "version": 1,
   "agent": {
-    "name": "Fred",
-    "description": "fair, just and witty",
-    "vibe": null,
-    "emoji": "🤖"
+    "name": "Party Quest",
+    "description": "A multiplayer chat RPG host that gathers a group, builds characters, and runs a five-round campaign arc with a finale and sequel hook.",
+    "vibe": "Witty, fair, momentum-focused, and comfortable guiding multiplayer story play.",
+    "emoji": "🎲"
   },
+  "template": {
+    "slug": "party-quest",
+    "category": "games",
+    "partnerName": "Pinata",
+    "tags": [
+      "rpg",
+      "game-master",
+      "discord",
+      "telegram",
+      "multiplayer",
+      "story",
+      "campaign"
+    ]
+  },
+  "secrets": [
+    {
+      "name": "OPENAI_OAUTH_TOKEN",
+      "description": "LLM provider auth token for the agent runtime.",
+      "required": true
+    },
+    {
+      "name": "DISCORD_BOT_TOKEN",
+      "description": "Optional: Discord bot token if you want the agent in Discord.",
+      "required": false
+    },
+    {
+      "name": "TELEGRAM_BOT_TOKEN",
+      "description": "Optional: Telegram bot token if you want the agent in Telegram.",
+      "required": false
+    }
+  ],
   "skills": [
     {
       "cid": "bafybeie6g6uyzkmq65y43v4qfgn6kguv5zvuduo2lcvqixlgsqzncc46fi",
@@ -21,9 +52,14 @@
       "name": "encounter_manager"
     }
   ],
-  "secrets": [
-    {
-      "name": "OPENAI_OAUTH_TOKEN"
+  "channels": {
+    "discord": {
+      "enabled": true,
+      "dmPolicy": "open"
+    },
+    "telegram": {
+      "enabled": true,
+      "dmPolicy": "open"
     }
-  ]
+  }
 }
