@@ -22,23 +22,6 @@
       "campaign"
     ]
   },
-  "secrets": [
-    {
-      "name": "OPENAI_OAUTH_TOKEN",
-      "description": "LLM provider auth token for the agent runtime.",
-      "required": true
-    },
-    {
-      "name": "DISCORD_BOT_TOKEN",
-      "description": "Optional: Discord bot token if you want the agent in Discord.",
-      "required": false
-    },
-    {
-      "name": "TELEGRAM_BOT_TOKEN",
-      "description": "Optional: Telegram bot token if you want the agent in Telegram.",
-      "required": false
-    }
-  ],
   "skills": [
     {
       "cid": "bafybeie6g6uyzkmq65y43v4qfgn6kguv5zvuduo2lcvqixlgsqzncc46fi",
