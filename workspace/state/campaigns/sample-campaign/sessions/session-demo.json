@@ -1,0 +1,16 @@
+{
+  "campaign_id": "sample-campaign",
+  "session_id": "session-demo",
+  "status": "paused",
+  "started_at": "2026-04-12T20:12:34Z",
+  "current_round": 1,
+  "open_loops": [
+    "security clock +1"
+  ],
+  "canon_notes": [
+    "Players requested a pause."
+  ],
+  "state_integrity": "partial",
+  "last_summary": "The party gained momentum but increased security pressure.",
+  "updated_at": "2026-04-12T20:57:02Z"
+}

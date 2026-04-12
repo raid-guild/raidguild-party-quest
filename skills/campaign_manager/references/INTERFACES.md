@@ -1,75 +1,92 @@
 # Interfaces
 
-This skill exchanges data with sibling skills through markdown files in `state/inputs/` and `state/handoffs/`.
+The campaign manager exchanges state through the shared campaign tree under `workspace/state/campaigns/<campaign_id>/`.
 
 ## Inputs
 
-### `state/inputs/known_characters.md`
+### `characters/<character_id>.json`
 
-Expected from a character creation skill or the user.
+Expected from `character_creation`.
 
-Recommended format:
+Recommended shape:
 
-```md
-# Known Characters
-
-## Party
-- Name | role | drive | notable edge
-
-## Important NPCs
-- NPC-001 | name | role | motive | relationship
+```json
+{
+  "character_id": "CHAR-001",
+  "name": "Mara",
+  "concept": "Streetwise courier with too many debts",
+  "role": "scout",
+  "drive": "Stay ahead of the people she owes",
+  "fear": "Being trapped where everyone can find her",
+  "edge": "Reads crowds and exits quickly",
+  "flaw": "Bails before trust fully lands",
+  "derived": {
+    "one_line_pitch": "Mara is a scout: Streetwise courier with too many debts.",
+    "campaign_hook": "Stay ahead of the people she owes",
+    "notable_edge": "Reads crowds and exits quickly"
+  }
+}
 ```
 
-### `state/inputs/world_seed.md`
+### `logs/event-log.jsonl`
 
-Freeform campaign seed. The bootstrap script uses the first heading and the first paragraph as the initial premise when possible.
+Expected from `encounter_manager`.
 
-### `state/inputs/encounter_results.md`
+Recommended event types:
 
-Expected from the encounter manager after a scene resolves.
+- `scene_prepared`
+- `roll_resolved`
+- `consequence_applied`
+- `beat_closed`
 
-Recommended format:
+Example:
 
-```md
-# Encounter Results
-
-- Encounter ID: TP-003
-- Session ID: SESSION-002
-- Timestamp: 2026-04-10T18:00:00Z
-- Outcome: success
-- Summary: The party exposed the smuggler but alerted the harbor watch.
-
-## Resolved Loops
-- LOOP-001 | Smuggler identified
-
-## New Loops
-- LOOP-003 | Harbor watch now wants payment for silence | pressure: high | next: secure leverage before dawn
-
-## World Changes
-- The harbor watch is alert and suspicious.
-
-## Rewards
-- A coded ledger naming two buyers.
-
-## Consequences
-- The smugglers know the party interfered.
-
-## Suggested Follow-Up
-- Push the party toward the buyers before the ledger is destroyed.
+```json
+{"ts":"2026-04-12T16:10:00Z","campaign_id":"ash-market","session_id":"telegram-01","scene_id":"auction-floor","type":"scene_prepared","beat_count":1,"objective":"Steal the ledger before bids close","action_count":3}
+{"ts":"2026-04-12T16:12:10Z","campaign_id":"ash-market","session_id":"telegram-01","scene_id":"auction-floor","type":"roll_resolved","beat_count":1,"actor":"Mara","intent":"Slip behind the clerk and lift the ledger","risk":"cautious","target_number":12,"roll_value":14,"modifier":0,"final_value":14,"outcome_band":"success"}
+{"ts":"2026-04-12T16:13:42Z","campaign_id":"ash-market","session_id":"telegram-01","scene_id":"auction-floor","type":"consequence_applied","beat_count":1,"status":"ongoing","added_hazards":["heightened pressure"],"added_opportunities":[]}
 ```
 
-The import script reads these sections by heading name. Keep them exact.
+### `active/scene.json`
+
+Live scene snapshot shared with `encounter_manager`.
+
+Use it to read:
+
+- current objective
+- beat pacing fields
+- spotlight-next
+- active pressure markers
 
 ## Outputs
 
-### `state/handoffs/next_encounter.md`
+### `rounds/round-XX-summary.md`
 
-The campaign manager should produce one primary touchpoint packet for the encounter manager. It should include:
+Required round artifact.
 
-- the selected touchpoint ID
-- the narrative purpose
-- the immediate trigger
-- the location
-- involved characters or factions
-- stakes and likely opposition
-- aftermath hooks if the scene succeeds or fails
+Include:
+
+- round number
+- summary of meaningful changes
+- unresolved threads
+- clocks changed
+- NPC changes
+- spotlight-next
+- canon ambiguity notes
+
+### `handoffs/latest-session.json`
+
+Required session handoff.
+
+Include:
+
+- `campaign_id`
+- `session_id`
+- `status`
+- `ended_at`
+- `current_round`
+- `next_scene_seed`
+- `open_loops`
+- `canon_notes`
+- `canon_status`
+- `state_integrity`

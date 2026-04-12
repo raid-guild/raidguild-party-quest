@@ -1,0 +1,4 @@
+- Mara: OOC: wait, are we pausing after this?
+- Theo: [[lol that guard is cooked]]
+- Mara: I slip behind the auctioneer and grab the ledger.
+- Theo: pause here after this scene

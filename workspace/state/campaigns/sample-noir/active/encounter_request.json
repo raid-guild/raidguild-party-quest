@@ -1,0 +1,13 @@
+{
+  "campaign_id": "sample-noir",
+  "session_id": "session-01",
+  "scene_id": null,
+  "encounter_type": "narrative",
+  "objective": "",
+  "difficulty": "normal",
+  "players": [],
+  "npcs": [],
+  "environment": {
+    "tags": []
+  }
+}

@@ -23,12 +23,21 @@ def now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
+def repo_root() -> Path:
+    return Path(__file__).resolve().parents[3]
+
+
 def load_json(path: Path) -> dict:
     return json.loads(path.read_text())
 
 
 def write_json(path: Path, value: object) -> None:
     path.write_text(json.dumps(value, indent=2) + "\n")
+
+
+def append_event(path: Path, payload: dict) -> None:
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(payload) + "\n")
 
 
 def deterministic_roll(seed: str) -> int:
@@ -69,9 +78,7 @@ def outcome_band(roll_value: int, final_value: int, target: int) -> str:
     return "critical_success" if final_value - target >= 4 else "success"
 
 
-def status_from(resolutions: list[dict], request: dict) -> str:
-    if any(item["twist_triggered"] and item["outcome_band"] == "critical_success" for item in resolutions):
-        return "transformed"
+def status_from(resolutions: list[dict]) -> str:
     if all(item["outcome_band"] in {"success", "critical_success"} for item in resolutions):
         return "resolved"
     if all(item["outcome_band"] in {"failure", "critical_failure"} for item in resolutions):
@@ -79,131 +86,124 @@ def status_from(resolutions: list[dict], request: dict) -> str:
     return "ongoing"
 
 
-def bullet_lines(items: list[str]) -> str:
-    return "\n".join(f"- {item}" for item in items)
-
-
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Resolve a narrative encounter beat.")
-    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser = argparse.ArgumentParser(description="Resolve one encounter beat in the shared campaign tree.")
+    parser.add_argument("--campaign-id", required=True)
     args = parser.parse_args()
 
-    root = args.root
-    request = load_json(root / "state/inputs/encounter_request.json")
-    scene_state = load_json(root / "state/encounters/scene_state.json")
-    normalized = load_json(root / "state/encounters/normalized_actions.json")
-    optional_rolls = load_json(root / "state/inputs/optional_rolls.json").get("rolls", {})
+    campaign_root = repo_root() / "workspace/state/campaigns" / args.campaign_id
+    active_root = campaign_root / "active"
+    request = load_json(active_root / "encounter_request.json")
+    scene_state = load_json(active_root / "scene.json")
+    normalized = load_json(active_root / "normalized_actions.json")
+    optional_rolls = load_json(active_root / "optional_rolls.json").get("rolls", {})
+    event_log_path = campaign_root / "logs/event-log.jsonl"
 
     resolutions = []
+    next_beat = int(scene_state.get("beat_count", 0)) + 1
+
     for index, action in enumerate(normalized.get("actions", []), start=1):
-        action_id = f"ACTION-{index:03d}"
-        seed = f"{request.get('encounter_id')}:{action['player_id']}:{action['intent']}"
+        seed = f"{request.get('scene_id')}:{action['player_id']}:{action['intent']}"
         roll_value = optional_rolls.get(action["player_id"], deterministic_roll(seed))
         mod = modifier(action)
         target = target_number(request, action, scene_state)
         final = roll_value + mod
         band = outcome_band(roll_value, final, target)
         twist = band in {"critical_failure", "critical_success"} or scene_state.get("tension") in {"high", "critical"}
-        resolutions.append(
+        resolution = {
+            "action_id": f"ACTION-{index:03d}",
+            "actor_id": action["player_id"],
+            "roll_type": "d20",
+            "roll_value": roll_value,
+            "modifier": mod,
+            "final_value": final,
+            "target_number": target,
+            "outcome_band": band,
+            "twist_triggered": twist,
+            "twist_type": TWISTS.get(request.get("encounter_type"), "unexpected turn") if twist else None,
+        }
+        resolutions.append(resolution)
+        append_event(
+            event_log_path,
             {
-                "action_id": action_id,
-                "actor_id": action["player_id"],
-                "roll_type": "d20",
+                "ts": now_iso(),
+                "campaign_id": request.get("campaign_id"),
+                "session_id": request.get("session_id"),
+                "scene_id": request.get("scene_id"),
+                "type": "roll_resolved",
+                "beat_count": next_beat,
+                "actor": action["player_id"],
+                "intent": action["intent"],
+                "risk": action["risk_level"],
+                "target_number": target,
                 "roll_value": roll_value,
                 "modifier": mod,
                 "final_value": final,
-                "target_number": target,
                 "outcome_band": band,
-                "reasoning": f"{action['approach']} action resolved against a narrow difficulty band.",
-                "twist_triggered": twist,
-                "twist_type": TWISTS.get(request.get("encounter_type"), "unexpected turn") if twist else None,
-            }
+            },
         )
 
-    status = status_from(resolutions, request)
-    scene_state["phase"] = "aftermath" if status in {"resolved", "failed", "transformed"} else "resolution"
-    if status == "ongoing":
-        scene_state["round"] = int(scene_state.get("round", 1)) + 1
+    status = status_from(resolutions)
+    if next_beat >= int(scene_state.get("must_resolve_by", 5)) and status == "ongoing":
+        status = "cliffhanger"
+
+    scene_state["status"] = "aftermath" if status in {"resolved", "failed", "cliffhanger"} else "active"
+    scene_state["beat_count"] = next_beat
+    scene_state["updated_at"] = now_iso()
     if any(item["outcome_band"] == "critical_success" for item in resolutions):
         scene_state["tension"] = "high"
     elif any(item["outcome_band"] == "critical_failure" for item in resolutions):
         scene_state["tension"] = "critical"
 
-    added_hazards = []
-    added_opportunities = []
-    environment_changes = []
-    hooks = []
-    gm_notes = []
+    summary = f"{request.get('encounter_type', 'narrative').capitalize()} scene {request.get('scene_id')} resolved as {status}."
+    added_hazards = ["heightened pressure"] if status in {"failed", "cliffhanger"} else []
+    added_opportunities = ["momentum"] if status == "resolved" else []
 
-    if status == "resolved":
-        added_opportunities.append("momentum")
-        hooks.append("Push immediately into the next reveal before resistance regroups.")
-        gm_notes.append("The scene bent in the players' favor. Offer a strong follow-through choice.")
-    elif status == "failed":
-        added_hazards.append("heightened pressure")
-        hooks.append("Let failure redirect the scene instead of dead-ending it.")
-        gm_notes.append("Escalate pressure, but keep the next choice legible.")
-    elif status == "transformed":
-        added_hazards.append("encounter transformed")
-        environment_changes.append("The scene shifts into a new mode under fresh pressure.")
-        hooks.append("Ask who reacts first to the transformed scene.")
-        gm_notes.append("A critical result changed the shape of the encounter. Reframe quickly.")
-    else:
-        environment_changes.append("The scene remains in motion and pressure keeps building.")
-        hooks.append("Prompt the players to commit to the next beat before the scene cools.")
-        gm_notes.append("Use the next beat to sharpen stakes or expose a new angle.")
-
-    summary = f"{request.get('encounter_type', 'narrative').capitalize()} encounter resolved as {status} across {len(resolutions)} action(s)."
-    consequences = {
-        "narrative_update": summary,
-        "state_changes": {"players": [], "npcs": [], "monsters": []},
-        "scene_changes": {
-            "added_hazards": added_hazards,
-            "removed_hazards": [],
-            "added_opportunities": added_opportunities,
-            "removed_opportunities": [],
-            "environment_changes": environment_changes,
+    write_json(active_root / "scene.json", scene_state)
+    write_json(
+        campaign_root / "sessions" / f"{request.get('session_id')}.json",
+        {
+            "campaign_id": request.get("campaign_id"),
+            "session_id": request.get("session_id"),
+            "status": "open" if status == "ongoing" else "closing",
+            "last_scene_id": request.get("scene_id"),
+            "last_summary": summary,
+            "open_loops": [],
+            "canon_notes": [],
+            "state_integrity": "partial",
         },
-        "new_story_hooks": hooks,
-        "escalation": "high" if status in {"failed", "transformed"} else "low" if status == "ongoing" else "none",
-    }
-
-    result = {
-        "encounter_id": request.get("encounter_id"),
-        "status": status,
-        "summary": summary,
-        "updated_scene_state": scene_state,
-        "action_resolutions": resolutions,
-        "consequences": consequences,
-        "gm_notes": gm_notes,
-        "suggested_next_prompts": hooks[:3],
-    }
-    write_json(root / "state/outputs/encounter_result.json", result)
-    write_json(root / "state/encounters/scene_state.json", scene_state)
-
-    timestamp = now_iso()
-    session_id = request.get("scene_id", "SCENE-001").replace("SCENE", "SESSION")
-    markdown = (root / "assets/templates/encounter_results.template.md").read_text().format(
-        encounter_id=request.get("encounter_id"),
-        session_id=session_id,
-        timestamp=timestamp,
-        outcome=status,
-        summary=summary,
-        resolved_loops="",
-        new_loops=bullet_lines(hooks[:1]),
-        world_changes=bullet_lines(environment_changes or ["Encounter pressure changed the scene state."]),
-        rewards=bullet_lines(added_opportunities or ["No clean reward. The value is narrative position."]),
-        consequences=bullet_lines(added_hazards or ["Pressure remains active and unresolved."]),
-        suggested_follow_up=bullet_lines(hooks[:3] or ["Ask the players what they do next."]),
     )
-    (root / "state/outputs/encounter_results.md").write_text(markdown if markdown.endswith("\n") else markdown + "\n")
 
-    change_log_path = root / "state/logs/change_log.md"
-    existing = change_log_path.read_text() if change_log_path.exists() else "# Change Log\n"
-    existing = existing.rstrip() + f"\n\n## {timestamp}\n\n- Resolved encounter {request.get('encounter_id')} as {status}.\n"
-    change_log_path.write_text(existing + "\n")
+    append_event(
+        event_log_path,
+        {
+            "ts": now_iso(),
+            "campaign_id": request.get("campaign_id"),
+            "session_id": request.get("session_id"),
+            "scene_id": request.get("scene_id"),
+            "type": "consequence_applied",
+            "beat_count": next_beat,
+            "status": status,
+            "added_hazards": added_hazards,
+            "added_opportunities": added_opportunities,
+        },
+    )
+    append_event(
+        event_log_path,
+        {
+            "ts": now_iso(),
+            "campaign_id": request.get("campaign_id"),
+            "session_id": request.get("session_id"),
+            "scene_id": request.get("scene_id"),
+            "type": "beat_closed",
+            "beat_count": next_beat,
+            "status": status,
+            "summary": summary,
+            "spotlight_next": scene_state.get("spotlight_next"),
+        },
+    )
 
-    print(f"Resolved encounter {request.get('encounter_id')} as {status}")
+    print(f"Resolved scene {request.get('scene_id')} as {status}")
     return 0
 
 

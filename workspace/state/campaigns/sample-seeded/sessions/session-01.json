@@ -1,0 +1,10 @@
+{
+  "campaign_id": "sample-seeded",
+  "session_id": "session-01",
+  "status": "open",
+  "started_at": "2026-04-12T22:11:58Z",
+  "current_round": 0,
+  "open_loops": [],
+  "canon_notes": [],
+  "state_integrity": "partial"
+}

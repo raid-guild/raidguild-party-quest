@@ -1,0 +1,13 @@
+{
+  "campaign_id": "sample-campaign",
+  "session_id": "session-demo",
+  "scene_id": null,
+  "encounter_type": "narrative",
+  "objective": "",
+  "difficulty": "normal",
+  "players": [],
+  "npcs": [],
+  "environment": {
+    "tags": []
+  }
+}

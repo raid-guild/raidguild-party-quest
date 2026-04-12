@@ -10,6 +10,10 @@ from pathlib import Path
 REQUIRED_FIELDS = ["character_id", "name", "concept", "role", "drive", "edge", "flaw", "derived"]
 
 
+def repo_root() -> Path:
+    return Path(__file__).resolve().parents[3]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate the character draft.")
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
@@ -34,6 +38,13 @@ def main() -> int:
         errors.append("concept is empty")
     if not session_state_path.exists():
         errors.append("session_state.json is missing")
+    else:
+        session_state = json.loads(session_state_path.read_text())
+        campaign_id = session_state.get("campaignContext", {}).get("campaign_id")
+        if campaign_id:
+            shared_path = repo_root() / "workspace/state/campaigns" / campaign_id / "characters" / f"{draft.get('character_id', 'CHAR-001')}.json"
+            if not shared_path.exists():
+                errors.append(f"shared character export missing: {shared_path}")
 
     print("Validation report")
     print(f"- Root: {args.root}")

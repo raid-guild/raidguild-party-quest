@@ -8,45 +8,50 @@ from pathlib import Path
 
 
 REQUIRED_FILES = [
-    "state/inputs/encounter_request.json",
-    "state/inputs/raw_player_messages.md",
-    "state/inputs/optional_rolls.json",
-    "state/encounters/scene_state.json",
-    "state/encounters/normalized_actions.json",
-    "state/outputs/encounter_result.json",
-    "state/outputs/encounter_results.md",
-    "state/logs/change_log.md",
+    "active/encounter_request.json",
+    "active/raw_player_messages.md",
+    "active/optional_rolls.json",
+    "active/scene.json",
+    "active/normalized_actions.json",
+    "logs/event-log.jsonl",
 ]
 
 
+def repo_root() -> Path:
+    return Path(__file__).resolve().parents[3]
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Validate encounter manager state.")
-    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser = argparse.ArgumentParser(description="Validate shared encounter state.")
+    parser.add_argument("--campaign-id", required=True)
     args = parser.parse_args()
 
-    root = args.root
+    campaign_root = repo_root() / "workspace/state/campaigns" / args.campaign_id
     errors = []
 
     for rel in REQUIRED_FILES:
-        path = root / rel
+        path = campaign_root / rel
         if not path.exists():
             errors.append(f"missing: {rel}")
 
-    request_path = root / "state/inputs/encounter_request.json"
+    request_path = campaign_root / "active/encounter_request.json"
     if request_path.exists():
         request = json.loads(request_path.read_text())
-        for field in ["encounter_id", "campaign_id", "scene_id", "encounter_type", "difficulty", "objective"]:
+        for field in ["campaign_id", "session_id", "scene_id", "encounter_type", "difficulty", "objective"]:
             if field not in request:
                 errors.append(f"encounter_request missing: {field}")
+        if request.get("campaign_id") != args.campaign_id:
+            errors.append("encounter_request campaign_id mismatch")
 
-    result_path = root / "state/outputs/encounter_result.json"
-    if result_path.exists():
-        result = json.loads(result_path.read_text())
-        if "encounter_id" not in result:
-            errors.append("encounter_result missing encounter_id")
+    scene_path = campaign_root / "active/scene.json"
+    if scene_path.exists():
+        scene = json.loads(scene_path.read_text())
+        for field in ["campaign_id", "session_id", "scene_id", "beat_count", "beat_cap"]:
+            if field not in scene:
+                errors.append(f"scene missing: {field}")
 
     print("Validation report")
-    print(f"- Root: {root}")
+    print(f"- Campaign root: {campaign_root}")
     if errors:
         print("- Errors:")
         for item in errors:

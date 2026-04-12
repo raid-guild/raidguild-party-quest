@@ -4,74 +4,97 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+import json
 from pathlib import Path
-
-
-TEXT_TEMPLATES = {
-    "assets/templates/raw_player_messages.template.md": "state/inputs/raw_player_messages.md",
-    "assets/templates/encounter_results.template.md": "state/outputs/encounter_results.md",
-    "assets/templates/change_log.template.md": "state/logs/change_log.md",
-}
-
-JSON_TEMPLATES = {
-    "assets/templates/encounter_request.template.json": "state/inputs/encounter_request.json",
-    "assets/templates/optional_rolls.template.json": "state/inputs/optional_rolls.json",
-    "assets/templates/scene_state.template.json": "state/encounters/scene_state.json",
-    "assets/templates/normalized_actions.template.json": "state/encounters/normalized_actions.json",
-    "assets/templates/encounter_result.template.json": "state/outputs/encounter_result.json",
-}
 
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
-def write(path: Path, text: str) -> None:
+def repo_root() -> Path:
+    return Path(__file__).resolve().parents[3]
+
+
+def write_json(path: Path, payload: object, force: bool) -> bool:
+    if path.exists() and not force:
+        return False
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2) + "\n")
+    return True
+
+
+def write_text(path: Path, text: str, force: bool) -> bool:
+    if path.exists() and not force:
+        return False
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text if text.endswith("\n") else text + "\n")
+    return True
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Initialize encounter manager state.")
-    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser = argparse.ArgumentParser(description="Initialize shared encounter state.")
+    parser.add_argument("--campaign-id", required=True)
+    parser.add_argument("--session-id", required=True)
+    parser.add_argument("--scene-id", default="scene-001")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
 
-    root = args.root
-    timestamp = now_iso()
+    ts = now_iso()
+    campaign_root = repo_root() / "workspace/state/campaigns" / args.campaign_id
+    active_root = campaign_root / "active"
+    written: list[str] = []
 
-    for src, dest in JSON_TEMPLATES.items():
-        src_path = root / src
-        dest_path = root / dest
-        if args.force or not dest_path.exists():
-            write(dest_path, src_path.read_text())
+    files = {
+        active_root / "encounter_request.json": {
+            "campaign_id": args.campaign_id,
+            "session_id": args.session_id,
+            "scene_id": args.scene_id,
+            "encounter_type": "narrative",
+            "objective": "",
+            "difficulty": "normal",
+            "players": [],
+            "npcs": [],
+            "environment": {"tags": []},
+        },
+        active_root / "optional_rolls.json": {
+            "campaign_id": args.campaign_id,
+            "session_id": args.session_id,
+            "rolls": {},
+        },
+        active_root / "scene.json": {
+            "campaign_id": args.campaign_id,
+            "session_id": args.session_id,
+            "scene_id": args.scene_id,
+            "objective": "",
+            "status": "setup",
+            "beat_count": 0,
+            "beat_cap": 5,
+            "must_escalate_at": 4,
+            "must_resolve_by": 5,
+            "spotlight_next": None,
+            "tension": "rising",
+            "updated_at": ts,
+        },
+        active_root / "normalized_actions.json": {
+            "campaign_id": args.campaign_id,
+            "session_id": args.session_id,
+            "scene_id": args.scene_id,
+            "resolution_mode": "group",
+            "actions": [],
+        },
+    }
 
-    for src, dest in TEXT_TEMPLATES.items():
-        dest_path = root / dest
-        if not args.force and dest_path.exists():
-            continue
-        template = (root / src).read_text()
-        if dest.endswith("encounter_results.md"):
-            text = template.format(
-                encounter_id="TP-001",
-                session_id="SESSION-001",
-                timestamp=timestamp,
-                outcome="pending",
-                summary="Encounter output has not been generated yet.",
-                resolved_loops="",
-                new_loops="",
-                world_changes="",
-                rewards="",
-                consequences="",
-                suggested_follow_up="",
-            )
-        elif dest.endswith("change_log.md"):
-            text = template.format(generated_at=timestamp)
-        else:
-            text = template
-        write(dest_path, text)
+    for path, payload in files.items():
+        if write_json(path, payload, args.force):
+            written.append(str(path.relative_to(repo_root())))
 
-    print("Initialized encounter manager state")
+    if write_text(active_root / "raw_player_messages.md", "# Raw Player Messages\n", args.force):
+        written.append(str((active_root / "raw_player_messages.md").relative_to(repo_root())))
+
+    print("Initialized shared encounter state:")
+    for item in written:
+        print(f"- {item}")
     return 0
 
 

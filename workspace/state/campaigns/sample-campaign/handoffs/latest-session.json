@@ -1,0 +1,16 @@
+{
+  "campaign_id": "sample-campaign",
+  "session_id": "session-demo",
+  "status": "paused",
+  "ended_at": "2026-04-12T20:33:52Z",
+  "current_round": 1,
+  "next_scene_seed": "Escalate unresolved pressure from the last beat.",
+  "open_loops": [
+    "security clock +1"
+  ],
+  "canon_notes": [
+    "Players requested a pause."
+  ],
+  "canon_status": "provisional",
+  "state_integrity": "partial"
+}

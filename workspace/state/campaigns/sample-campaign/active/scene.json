@@ -1,0 +1,18 @@
+{
+  "campaign_id": "sample-campaign",
+  "session_id": "session-demo",
+  "scene_id": null,
+  "objective": "",
+  "status": "ready",
+  "beat_count": 0,
+  "beat_cap": 5,
+  "must_escalate_at": 4,
+  "must_resolve_by": 5,
+  "spotlight_next": null,
+  "tension": "rising",
+  "active_hazards": [],
+  "active_opportunities": [],
+  "environment_changes": [],
+  "unresolved_threads": [],
+  "spotlight_order": []
+}

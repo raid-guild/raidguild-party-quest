@@ -33,6 +33,10 @@ def write(path: Path, text: str) -> None:
     path.write_text(text if text.endswith("\n") else text + "\n")
 
 
+def repo_root() -> Path:
+    return Path(__file__).resolve().parents[3]
+
+
 def split_csv(value: str) -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()]
 
@@ -105,6 +109,10 @@ def render_handoff(draft: dict, root: Path) -> None:
 
 
 def update_session_state(root: Path, draft: dict) -> None:
+    existing = {}
+    session_state_path = root / "state/runtime/session_state.json"
+    if session_state_path.exists():
+        existing = load_json(session_state_path)
     completed_steps = []
     pending_field = ""
     pending_question = ""
@@ -134,7 +142,44 @@ def update_session_state(root: Path, draft: dict) -> None:
         "validationErrors": [],
         "assumptions": [],
     }
+    if existing.get("campaignContext"):
+        session_state["campaignContext"] = existing["campaignContext"]
     write(root / "state/runtime/session_state.json", json.dumps(session_state, indent=2))
+
+
+def export_shared_character(root: Path, draft: dict) -> None:
+    session_state_path = root / "state/runtime/session_state.json"
+    if not session_state_path.exists():
+        return
+    session_state = load_json(session_state_path)
+    campaign_context = session_state.get("campaignContext", {})
+    campaign_id = campaign_context.get("campaign_id")
+    if not campaign_id:
+        return
+    shared_path = repo_root() / "workspace/state/campaigns" / campaign_id / "characters" / f"{draft.get('character_id', 'CHAR-001')}.json"
+    shared_path.parent.mkdir(parents=True, exist_ok=True)
+    shared_path.write_text(json.dumps(draft, indent=2) + "\n")
+
+    player_handle = campaign_context.get("player_handle")
+    if not player_handle:
+        return
+    players_path = repo_root() / "workspace/state/campaigns" / campaign_id / "players.json"
+    if not players_path.exists():
+        return
+    players = load_json(players_path)
+    rows = players.get("players", [])
+    for player in rows:
+        if player.get("handle") != player_handle:
+            continue
+        player["character_id"] = draft.get("character_id", "CHAR-001")
+        player["character_name"] = draft.get("name") or player.get("character_name")
+        if draft.get("status") == "ready":
+            player["status"] = "ready"
+        elif player.get("status") == "invited":
+            player["status"] = "building"
+        break
+    players["updated_at"] = now_iso()
+    players_path.write_text(json.dumps(players, indent=2) + "\n")
 
 
 def main() -> int:
@@ -179,6 +224,7 @@ def main() -> int:
     draft_path.write_text(json.dumps(draft, indent=2) + "\n")
     render_handoff(draft, root)
     update_session_state(root, draft)
+    export_shared_character(root, draft)
 
     change_log = root / "state/logs/change_log.md"
     timestamp = now_iso()

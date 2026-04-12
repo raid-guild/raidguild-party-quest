@@ -1,204 +1,99 @@
 ---
 name: encounter_manager
-description: Resolve a single narrative encounter in a multiplayer chat-based campaign using lightweight d20 mechanics and structured consequences.
+description: Resolves one encounter beat with strict state-update and append-only logging discipline.
 ---
 
 # Encounter Manager
 
 ## Purpose
 
-Resolve one encounter beat inside a live campaign.
+Own the active scene loop for one campaign beat.
 
-This skill receives scene context, player actions, and stakes from upstream context, then returns:
-- structured outcomes
-- scene changes
-- condition changes
-- narrative consequences
-- suggested next prompts
+This skill handles:
+- scene preparation
+- roll resolution
+- consequence application
+- beat pacing
+- append-only event logging
 
-This is a story-forward encounter engine, not a full tactical combat simulator.
-
----
-
-## What This Skill Handles
-
-Supported encounter types:
-- social
-- hazard
-- combat
-- mystery
-- narrative
-
-Use it when something meaningful is uncertain and the story needs a clean resolution cycle.
-
----
-
-## What This Skill Does Not Handle
-
+This skill does not handle:
 - long-term campaign planning
-- player onboarding
 - character creation
-- full inventory simulation
-- tactical grid combat
-- deep class or spell systems
-- persistent world canon outside the encounter result
+- round summaries
+- session handoff ownership
 
----
+## Canonical State
 
-## Design Goals
+Use shared campaign state, not skill-local state.
 
-- Keep encounter resolution narrow and reliable
-- Support multiple players in chat rooms
-- Use lightweight d20-based outcomes
-- Favor consequences and twists over dead ends
-- Return structured data the Campaign Manager can continue from
-- Stay setting-agnostic
+Required files:
+- `workspace/state/campaigns/<campaign_id>/active/encounter_request.json`
+- `workspace/state/campaigns/<campaign_id>/active/raw_player_messages.md`
+- `workspace/state/campaigns/<campaign_id>/active/optional_rolls.json`
+- `workspace/state/campaigns/<campaign_id>/active/scene.json`
+- `workspace/state/campaigns/<campaign_id>/active/normalized_actions.json`
+- `workspace/state/campaigns/<campaign_id>/logs/event-log.jsonl`
 
----
+Read policy from `workspace/rules/core-policy.md`.
 
-## Canonical State Files
+## Required Workflow
 
-Maintain these files:
+Every uncertain turn must follow:
 
-- `state/inputs/encounter_request.json`
-- `state/inputs/raw_player_messages.md`
-- `state/inputs/optional_rolls.json`
-- `state/encounters/scene_state.json`
-- `state/encounters/normalized_actions.json`
-- `state/outputs/encounter_result.json`
-- `state/outputs/encounter_results.md`
-- `state/logs/change_log.md`
+1. `STATE READ`
+2. `ROLL`
+3. `STATE UPDATE`
+4. `EVENT LOG APPEND`
+5. `CHAT OUTPUT`
 
-All state for this skill is self-contained inside this skill folder under `state/`.
+If step 3 or step 4 fails, the beat is not resolved.
 
-Do not assume a repo-level shared `state/` directory.
+## Required Per-Beat Fields
 
-If another skill needs the encounter result, it should read or copy the export from this skill folder.
+Each beat must identify:
+- scene objective
+- acting character
+- intent
+- risk
+- roll trigger
+- roll result
+- consequence
+- updated pressure or clocks
+- next spotlight
 
-If files are missing, initialize them instead of failing.
+Before normalization, classify each message as:
 
----
+- `ooc_chat`
+- `ooc_command`
+- `ic_action`
 
-## Resolution Philosophy
+Only `ic_action` becomes a normalized encounter action.
 
-Use a narrow mechanical band:
-- one action per player per resolution cycle
-- one d20 roll per action
-- simple target numbers
-- five outcome bands
-- lightweight conditions
-- concise scene state
+## Pacing Rules
 
-Prefer:
-- success with cost
-- failure with new pressure
-- critical outcomes that shift the story
+Track:
+- `beat_count`
+- `beat_cap`
+- `must_escalate_at`
+- `must_resolve_by`
 
-Avoid:
-- complex math
-- long tactical exchanges
-- over-simulation
+If beat cap is exceeded, force a resolution or cliffhanger.
 
----
+## Failure Behavior
 
-## Required Workflow Modes
-
-### 1) Bootstrap Encounter State
-Initialize the encounter input, scene state, and output files from templates.
-
-### 2) Prepare Encounter
-Use when a fresh encounter request and player chat messages arrive.
-
-Steps:
-1. Read `encounter_request.json`
-2. Read `raw_player_messages.md`
-3. Build or refresh local `scene_state.json`
-4. Normalize player messages into `normalized_actions.json`
-5. Log the preparation step
-
-### 3) Resolve Encounter Beat
-Use when actions are ready to resolve.
-
-Steps:
-1. Read the encounter request, scene state, normalized actions, and optional rolls
-2. Set target numbers within the narrow allowed band
-3. Roll or use provided rolls
-4. Assign outcome bands
-5. Apply consequences, twists, and scene updates
-6. Write both structured JSON and campaign-manager-compatible markdown
-7. Log the transition
-
-### 4) Recap
-Return:
-- current scene state
-- action resolutions
-- encounter status
-- next likely prompts
-
----
-
-## Operating Rules
-
-- Normalize every player message into one primary intent and one broad approach.
-- Use these approaches only:
-  - `force`
-  - `finesse`
-  - `charm`
-  - `insight`
-  - `weird`
-  - `support`
-- Keep target numbers in the practical range from `8` to `18`.
-- Use exactly these outcome bands:
-  - `critical_failure`
-  - `failure`
-  - `mixed_success`
-  - `success`
-  - `critical_success`
-- Every resolution cycle should change the scene in some way.
-
----
-
-## Output Contracts
-
-Write a structured result object to:
-- `state/outputs/encounter_result.json`
-
-Write a Campaign Manager import packet to:
-- `state/outputs/encounter_results.md`
-
-The markdown export must remain compatible with the Campaign Manager expectation for:
-- `Encounter ID`
-- `Session ID`
-- `Timestamp`
-- `Outcome`
-- `Summary`
-- `Resolved Loops`
-- `New Loops`
-- `World Changes`
-- `Rewards`
-- `Consequences`
-- `Suggested Follow-Up`
-
----
+- If `campaign_id` is ambiguous, stop and ask.
+- If active scene state is missing, scaffold it before continuing.
+- If append-only logging fails, do not narrate a finalized outcome.
+- If rules conflict with prompt prose, follow `workspace/rules/core-policy.md`.
+- If a message is OOC, do not treat it as an in-fiction action.
 
 ## Bundled Helpers
 
 - `scripts/bootstrap_state.py`
-  Initializes encounter manager state from templates.
+  Initializes shared active encounter files.
 - `scripts/validate_state.py`
-  Validates required files and key identifiers.
+  Validates shared active encounter files.
 - `scripts/prepare_encounter.py`
-  Builds scene state and normalized action objects from inputs.
+  Normalizes actions and refreshes active scene state.
 - `scripts/resolve_encounter.py`
-  Resolves actions into a structured result and markdown export.
-
----
-
-## Reference Files
-
-Load these as needed:
-
-- `references/DATA_MODEL.md`
-- `references/RESOLUTION_RULES.md`
-- `references/TWIST_GUIDELINES.md`
-- `references/TRANSCRIPT_EXAMPLE.md`
+  Resolves one beat and appends event records.

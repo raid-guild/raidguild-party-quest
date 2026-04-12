@@ -1,0 +1,15 @@
+{
+  "campaign_id": "sample-opening",
+  "title": "Ash Market",
+  "status": "setup",
+  "current_round": 0,
+  "active_scene": null,
+  "beat_count": 0,
+  "beat_cap": 5,
+  "must_escalate_at": 4,
+  "must_resolve_by": 5,
+  "canon_status": "provisional",
+  "state_integrity": "partial",
+  "created_at": "2026-04-12T21:38:46Z",
+  "updated_at": "2026-04-12T21:38:46Z"
+}

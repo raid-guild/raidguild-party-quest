@@ -1,0 +1,6 @@
+
+{"ts":"2026-04-12T20:15:00Z","campaign_id":"sample-campaign","session_id":"session-demo","scene_id":"scene-demo","type":"roll_resolved","beat_count":1,"actor":"CHAR-001","intent":"Test action","risk":"standard","target_number":12,"roll_value":15,"modifier":0,"final_value":15,"outcome_band":"success"}
+{"ts":"2026-04-12T20:15:10Z","campaign_id":"sample-campaign","session_id":"session-demo","scene_id":"scene-demo","type":"consequence_applied","beat_count":1,"status":"ongoing","added_hazards":["security clock +1"],"added_opportunities":["momentum"]}
+{"ts":"2026-04-12T20:15:20Z","campaign_id":"sample-campaign","session_id":"session-demo","scene_id":"scene-demo","type":"beat_closed","beat_count":1,"status":"ongoing","summary":"The party gained momentum but increased security pressure.","spotlight_next":"mara"}
+{"ts": "session-demo", "campaign_id": "sample-campaign", "session_id": "session-demo", "scene_id": null, "type": "scene_prepared", "beat_count": 0, "objective": "", "action_count": 1, "ignored_ooc_count": 2, "admin_command_count": 1}
+{"ts": "session-demo", "campaign_id": "sample-campaign", "session_id": "session-demo", "scene_id": null, "type": "ooc_command_detected", "beat_count": 0, "actor_name": "Theo", "message": "pause here after this scene"}

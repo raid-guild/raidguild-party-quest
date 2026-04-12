@@ -1,0 +1,33 @@
+{
+  "campaign_id": "sample-campaign",
+  "session_id": "session-demo",
+  "scene_id": null,
+  "resolution_mode": "individual",
+  "actions": [
+    {
+      "player_id": "MARA",
+      "actor_name": "Mara",
+      "message_class": "ic_action",
+      "approach": "finesse",
+      "intent": "I slip behind the auctioneer and grab the ledger.",
+      "risk_level": "standard",
+      "roll_trigger": "risky_action"
+    }
+  ],
+  "ignored_ooc_chat": [
+    {
+      "actor_name": "Mara",
+      "message": "OOC: wait, are we pausing after this?"
+    },
+    {
+      "actor_name": "Theo",
+      "message": "[[lol that guard is cooked]]"
+    }
+  ],
+  "admin_commands": [
+    {
+      "actor_name": "Theo",
+      "message": "pause here after this scene"
+    }
+  ]
+}

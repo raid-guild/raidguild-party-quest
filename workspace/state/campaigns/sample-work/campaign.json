@@ -1,0 +1,18 @@
+{
+  "campaign_id": "sample-work",
+  "title": "Quarter Close",
+  "seed": "A small operations team is handed a broken enterprise rollout hours before leadership reviews the quarter.",
+  "style": "work sim with office politics",
+  "preset": null,
+  "status": "setup",
+  "current_round": 0,
+  "active_scene": null,
+  "beat_count": 0,
+  "beat_cap": 5,
+  "must_escalate_at": 4,
+  "must_resolve_by": 5,
+  "canon_status": "provisional",
+  "state_integrity": "partial",
+  "created_at": "2026-04-12T22:32:31Z",
+  "updated_at": "2026-04-12T22:32:31Z"
+}

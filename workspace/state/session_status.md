@@ -1,4 +1,4 @@
-# Session Status
+# Legacy Session Status
 
 - Updated: 2026-04-10T19:42:51Z
 - Campaign Status: onboarding
@@ -19,7 +19,7 @@
 
 ## Current Goal
 
-- Collect seed, roster, and all player characters.
+- Migrate active play into `workspace/state/campaigns/<campaign_id>/campaign.json`.
 
 ## Transition Rules
 
@@ -29,3 +29,8 @@
 ## Ending Checklist Pointer
 
 - Use `workspace/FINALE_CHECKLIST.md` when entering round 5 or epilogue framing.
+
+## Migration Note
+
+- This file is now a lobby-era summary only.
+- Canonical round and pressure state belong inside each campaign folder.

@@ -46,3 +46,6 @@ Arguments:
 - Generic by default.
 - Offer presets when the group wants a quick start.
 - The default included preset is `The Last Chance Formal`.
+# Deprecated Note
+
+This file still references the older skill-local state layout. Use `workspace/state/README.md` and `workspace/rules/core-policy.md` as the current source of truth.

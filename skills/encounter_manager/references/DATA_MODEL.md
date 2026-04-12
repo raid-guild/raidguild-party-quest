@@ -1,75 +1,89 @@
 # Data Model
 
-## encounter_request
+The encounter manager reads and writes shared active scene state under `workspace/state/campaigns/<campaign_id>/`.
 
-Store the incoming structured request in `state/inputs/encounter_request.json`.
+## `active/encounter_request.json`
 
 Recommended shape:
 
 ```json
 {
-  "encounter_id": "TP-001",
-  "campaign_id": "CAMPAIGN-001",
-  "scene_id": "SCENE-001",
+  "campaign_id": "ash-market",
+  "session_id": "telegram-01",
+  "scene_id": "auction-floor",
   "encounter_type": "social",
-  "tone": "tense, strange, low-magic",
-  "objective": "Get past the ferryman guarding passage across the river.",
+  "objective": "Get the ledger before bids close",
   "difficulty": "normal",
-  "narrative_context": "The river crossing is the only obvious way forward.",
-  "trigger": "The party reaches the dock at dusk.",
-  "stakes": {
-    "success": "The party crosses safely.",
-    "failure": "The ferryman refuses and alerts nearby patrol.",
-    "complication": "The ferryman reveals a hidden price or secret condition."
-  },
-  "environment": {
-    "location_name": "Black River Dock",
-    "description": "A narrow ferry platform rocks against the dock in cold mist.",
-    "tags": ["water", "mist", "unstable", "only-route-forward"]
-  },
   "players": [
     {
       "id": "CHAR-001",
-      "name": "Nyra",
-      "traits": ["sharp", "intuitive", "calm"],
-      "conditions": [],
-      "inventory_tags": [],
-      "narrative_role": "observer"
+      "name": "Mara"
     }
   ],
   "npcs": [],
-  "monsters": [],
+  "environment": {
+    "tags": ["crowd", "cover"]
+  },
   "prior_state_refs": []
 }
 ```
 
-## scene_state
+Required fields:
 
-The local scene state lives in `state/encounters/scene_state.json`.
+- `campaign_id`
+- `session_id`
+- `scene_id`
+- `encounter_type`
+- `objective`
+- `difficulty`
+
+## `active/scene.json`
 
 Keep:
-- `round`
-- `phase`
+
+- `campaign_id`
+- `session_id`
+- `scene_id`
+- `objective`
+- `status`
+- `beat_count`
+- `beat_cap`
+- `must_escalate_at`
+- `must_resolve_by`
+- `spotlight_next`
 - `tension`
-- `active_hazards`
-- `active_opportunities`
-- `environment_changes`
-- `unresolved_threads`
-- `spotlight_order`
 
-## normalized_actions
-
-The normalized player actions live in `state/encounters/normalized_actions.json`.
+## `active/normalized_actions.json`
 
 Each action should include:
+
 - `player_id`
+- `actor_name`
 - `approach`
 - `intent`
-- `target_id`
-- `uses_item_tag`
 - `risk_level`
-- `aiding_player_id`
+- `roll_trigger`
 
-## encounter_result
+Only `ic_action` messages should appear here.
 
-Write the final structured output to `state/outputs/encounter_result.json`.
+## Message Classification
+
+Before action normalization, classify raw chat into:
+
+- `ooc_chat`
+- `ooc_command`
+- `ic_action`
+
+`ooc_chat` should be excluded from beat resolution.
+`ooc_command` may produce admin events, but not action resolution records.
+
+## `logs/event-log.jsonl`
+
+Append these event types during resolution:
+
+- `scene_prepared`
+- `roll_resolved`
+- `consequence_applied`
+- `beat_closed`
+
+No finalized narration should happen before the append succeeds.

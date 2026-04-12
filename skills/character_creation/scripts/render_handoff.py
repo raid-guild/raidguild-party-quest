@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from update_character import load_json, recompute, render_handoff
+from update_character import export_shared_character, load_json, recompute, render_handoff
 
 
 def main() -> int:
@@ -16,6 +16,7 @@ def main() -> int:
     draft = load_json(args.root / "state/outputs/character_draft.json")
     recompute(draft)
     render_handoff(draft, args.root)
+    export_shared_character(args.root, draft)
     print("Rendered character handoff")
     return 0
 

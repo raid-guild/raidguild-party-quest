@@ -1,0 +1,13 @@
+{
+  "campaign_id": "sample-preset",
+  "session_id": "session-01",
+  "scene_id": null,
+  "objective": "",
+  "status": "idle",
+  "beat_count": 0,
+  "beat_cap": 5,
+  "must_escalate_at": 4,
+  "must_resolve_by": 5,
+  "spotlight_next": null,
+  "updated_at": "2026-04-12T22:11:58Z"
+}

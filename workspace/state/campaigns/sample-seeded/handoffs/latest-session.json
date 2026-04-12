@@ -1,0 +1,13 @@
+{
+  "campaign_id": "sample-seeded",
+  "session_id": "session-01",
+  "status": "open",
+  "ended_at": null,
+  "current_round": 0,
+  "next_scene_seed": "",
+  "opening_brief_ready": true,
+  "open_loops": [],
+  "canon_notes": [],
+  "canon_status": "provisional",
+  "state_integrity": "partial"
+}

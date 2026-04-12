@@ -1,0 +1,15 @@
+{
+  "campaign_id": "sample-ready",
+  "players": [
+    {
+      "handle": "mara",
+      "display_name": "Mara",
+      "status": "ready",
+      "character_id": "CHAR-MARA",
+      "character_name": "Mara",
+      "notes": ""
+    }
+  ],
+  "start_short_handed_allowed": false,
+  "updated_at": "2026-04-12T22:03:06Z"
+}
