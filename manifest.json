@@ -7,6 +7,11 @@
     "vibe": null,
     "emoji": "🤖"
   },
+  "template": {
+    "slug": "fred",
+    "category": "games",
+    "authorName": "Raid Guild"
+  },
   "skills": [
     {
       "cid": "bafybeie6g6uyzkmq65y43v4qfgn6kguv5zvuduo2lcvqixlgsqzncc46fi",
@@ -23,7 +28,8 @@
   ],
   "secrets": [
     {
-      "name": "OPENAI_OAUTH_TOKEN"
+      "name": "OPENAI_OAUTH_TOKEN",
+      "description": "OAuth token used to authenticate OpenAI-backed agent requests."
     }
   ]
 }
